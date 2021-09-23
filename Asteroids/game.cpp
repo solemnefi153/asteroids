@@ -384,36 +384,37 @@ void Game :: handleCollisions()
                switch((*it)->hit())
                {
                    case 1:
-                      for(int i = 0; i < 1; i++)
-                      {
-                           Rock * mediumRock1 = createMediumRock((*it)->getPoint());
-                           mediumRock1->setDx((*it)->getVelocity().getDx());
-                           mediumRock1->setDy(((*it)->getVelocity().getDy() + 1));
-                           rocks.push_back(mediumRock1);
-                    
-                           Rock * mediumRock2 = createMediumRock((*it)->getPoint());
-                           mediumRock2->setDx((*it)->getVelocity().getDx());
-                           mediumRock2->setDy(((*it)->getVelocity().getDy() - 1));
-                           rocks.push_back(mediumRock2);
-            
-                           Rock * smallRock = createSmallRock ((*it)->getPoint());
-                           smallRock->setDx(((*it)->getVelocity().getDx() + 2));
-                           smallRock->setDy((*it)->getVelocity().getDy());
-                           rocks.push_back(smallRock);
-                       }
-                       
+                       for(int i = 0; i < 1; i++)
+                        {
+                          
+                            Point originalPoint = (*it)->getPoint();
+                            int originalDy = (*it)->getVelocity().getDy();
+                            int originalDx = (*it)->getVelocity().getDx();
+
+                            Rock * smallRock1 = createRock("small", originalPoint, originalDy, originalDx + 2);
+
+                            Rock * mediumRock1 = createRock("medium", originalPoint, originalDy + 1, originalDx);
+
+                            Rock * mediumRock2 = createRock("medium", originalPoint, originalDy - 1, originalDx - 1);
+
+
+                            rocks.push_back(smallRock1);
+                            rocks.push_back(mediumRock1);
+                            rocks.push_back(mediumRock2);
+                        }
                        break;
                    case 2:
                        for(int i = 0; i < 1; i++)
                        {
-                           Rock * smallRock1 = createSmallRock ((*it)->getPoint());
-                           smallRock1->setDx(((*it)->getVelocity().getDx()) + 3);
-                           smallRock1->setDy((*it)->getVelocity().getDy());
-                           rocks.push_back(smallRock1);
+                           Point originalPoint = (*it)->getPoint();
+                           int originalDy = (*it)->getVelocity().getDy();
+                           int originalDx = (*it)->getVelocity().getDx();
                            
-                           Rock * smallRock2 = createSmallRock ((*it)->getPoint());
-                           smallRock2->setDx(((*it)->getVelocity().getDx()) - 3);
-                           smallRock2->setDy((*it)->getVelocity().getDy());
+                           Rock * smallRock1 = createRock("small", originalPoint, originalDy - 3, originalDx);
+                           
+                           Rock * smallRock2 = createRock("small", originalPoint, originalDy, originalDx - 3);
+                           
+                           rocks.push_back(smallRock1);
                            rocks.push_back(smallRock2);
                        }
                        break;
@@ -468,24 +469,36 @@ void Game::cleanUpZombies()
     }
 }
 
-Rock * Game::createBigRock()
-{
-    Rock * rock = new BigRock(topLeft, bottomRight);
-    return rock;
+/**********************************************************
+* Function: createRock
+* Description: Based on the provided parameters, this funciton creates a type of rock. Likewise
+ * based on parameters this function sets some properties of the newly created rock
+**********************************************************/
+
+Rock * Game::createRock(string type, Point p, int dy, int dx){
+    
+    Rock * rock = nullptr;
+    //Case for big rock
+    if(type == "big"){
+        Rock * rock = new BigRock(topLeft, bottomRight);
+        return rock;
+    }
+    //Cases for medium and small rock
+    else if(type == "medium"){
+        rock = new MediumRock(topLeft, bottomRight, p);
+        rock->setDy(dy);
+        rock->setDx(dx);
+        return rock;
+    }
+    else if (type == "small"){
+        rock = new BigRock(topLeft, bottomRight);
+        rock->setDy(dy);
+        rock->setDx(dx);
+        return rock;
+    }
+    throw "Invalid rock type: " + type;
 }
 
-Rock * Game::createMediumRock(Point center)
-{
-    Rock * rock = new MediumRock(topLeft,  bottomRight, center);
-    return rock;
-}
-
-Rock * Game::createSmallRock(Point center)
-{
-    Rock * rock = new SmallRock(topLeft,  bottomRight, center);
-    return rock;
-
-}
 
 void Game::startLevel(int level)
 {
@@ -501,7 +514,7 @@ void Game::startLevel(int level)
     levelCompleted = false;
     for(int i = 0; i < ((level * 2) + 2);i++)
     {
-        rocks.push_back(createBigRock());
+        rocks.push_back(createRock("big"));
     }
 }
 // You may find this function helpful...

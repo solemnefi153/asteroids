@@ -17,6 +17,8 @@
 #include "ship.h"
 #include "star.h"
 
+using namespace std;
+
 
 
 
@@ -56,9 +58,7 @@ private:
     void restartGame();
     void cleanGame();
     void setHighScore();
-    Rock* createBigRock();
-    Rock* createMediumRock(Point center);
-    Rock* createSmallRock(Point center);
+    Rock* createRock(string type, Point p = {0, 0}, int dy = 0, int dx = 0);
     void startLevel(int level);
     float getClosestDistance(const FlyingObject &obj1, const FlyingObject &obj2) const;
     bool closeEnough(Point obj1, Point obj2, int radius1, int radius2);
